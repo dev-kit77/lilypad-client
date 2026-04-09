@@ -1,7 +1,5 @@
 // All requests related to the "Special" (admin) actions
 
-import { log } from "node:console";
-
 //URL to api
 const url: string = "http://localhost:3000/api";
 
@@ -30,13 +28,17 @@ export async function getUser(userId: string) {
 	}
 }
 
+//ADMIN MODERATING
 /**
  * Ban/Unban the specified user. This is an admin-only endpoint.
  * @param userId
- * @param length legnth of ban in days
  * @param active set to banned or unbanned
+ * @param length Optional legnth of ban in days
  */
-export async function banUser(userId: string, length: number, active: boolean) {
+export async function banUser(
+	userId: string,
+	params: { active: boolean; length?: number }
+) {
 	try {
 		const response = await fetch(`${url}/user/${userId}`, {
 			method: "PUT",
@@ -44,10 +46,7 @@ export async function banUser(userId: string, length: number, active: boolean) {
 				"Content-Type": "application/json"
 			},
 			credentials: "include",
-			body: JSON.stringify({
-				active: active,
-				lengthOfBanInDays: length
-			})
+			body: JSON.stringify(params)
 		});
 		if (!response.ok) {
 			throw new Error(`Response status: ${response.status}`, {
@@ -55,6 +54,92 @@ export async function banUser(userId: string, length: number, active: boolean) {
 			});
 		}
 		console.log(`BanHammer: ${response.status}`);
+	} catch (error: any) {
+		console.error(error);
+		return error.cause;
+	}
+}
+
+/**
+ * @returns List of Reports
+ */
+export async function getAllReports() {
+	try {
+		const response = await fetch(`${url}/special`, {
+			headers: {
+				"Content-Type": "application/json"
+			},
+			credentials: "include"
+		});
+		if (!response.ok) {
+			throw new Error(`Response status: ${response.status}`, {
+				cause: response.status
+			});
+		}
+		const result = response.json();
+		console.log(`Get Reports status: ${response.status}`);
+		return result;
+	} catch (error: any) {
+		console.error(error);
+		return error.cause;
+	}
+}
+
+/**
+ * Retrieves a single report specified by its ID
+ * @param reportId
+ * @returns Promise containing the Report
+ */
+export async function getReport(reportId: string) {
+	try {
+		const response = await fetch(`${url}/special/${reportId}`, {
+			headers: {
+				"Content-Type": "application/json"
+			},
+			credentials: "include"
+		});
+		if (!response.ok) {
+			throw new Error(`Response status: ${response.status}`, {
+				cause: response.status
+			});
+		}
+		const result = response.json();
+		console.log(`Get Report status: ${response.status}`);
+		return result;
+	} catch (error: any) {
+		console.error(error);
+		return error.cause;
+	}
+}
+
+/**
+ * Update the specified Report status
+ * @param reportId
+ * @param resolved Optional Mark this Report as resolved or not
+ * @param action Optional update the action taken on this Report
+ * @returns Promise containing the Report
+ */
+export async function updateReport(
+	reportId: string,
+	params: { resolved?: boolean; action?: string }
+) {
+	try {
+		const response = await fetch(`${url}/special/${reportId}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			credentials: "include",
+			body: JSON.stringify(params)
+		});
+		if (!response.ok) {
+			throw new Error(`Response status: ${response.status}`, {
+				cause: response.status
+			});
+		}
+		const result = response.json();
+		console.log(`Update Report status: ${response.status}`);
+		return result;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
