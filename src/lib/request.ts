@@ -183,28 +183,47 @@ export async function getUser() {
 }
 
 /**
- *Update the current user's profile and settings
- * @param username name visible to others
- * @param status status of user
- * @param settings {dark: bool, anon: bool)}
+ * Export personal data for the authenticated user (GDPR SAR).
+ * @returns all data associated with the current user
  */
-export async function setUser(
-	username: string,
-	status: string,
-	settings: Object
-) {
+async function getUserFull() {
 	try {
-		const response = await fetch(`${url}/api/user`, {
+		const response = await fetch(`${url}/user/gdpr-sar`, {
+			headers: {
+				"Content-Type": "application/json"
+			},
+			credentials: "include"
+		});
+		if (!response.ok) {
+			throw new Error(`Response status: ${response.status}`);
+		}
+		const result = response.json();
+		console.log(`GDPR get all data status: ${response.status}`);
+
+		return result;
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+/**
+ *Update the current user's profile and settings
+ * @param Object containing user settings to be updated (each setting is optional): {username: string, bio: string, status: string , settings: {dark:bool, anon:bool}}
+ */
+export async function updateUser(params: {
+	username?: string;
+	bio?: string;
+	status?: string;
+	settings?: { dark?: boolean; anon?: boolean };
+}) {
+	try {
+		const response = await fetch(`${url}/user`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json"
 			},
 			credentials: "include",
-			body: JSON.stringify({
-				username: username,
-				status: status,
-				settings: settings
-			})
+			body: JSON.stringify(params)
 		});
 
 		if (!response.ok) {
@@ -222,7 +241,7 @@ export async function setUser(
  */
 export async function deleteUser() {
 	try {
-		const response = await fetch(`${url}/api/user`, {
+		const response = await fetch(`${url}/user`, {
 			method: "DELETE",
 			credentials: "include"
 		});
@@ -253,7 +272,7 @@ export async function reportUser(
 		if (!lat || !lon) {
 			getLocation();
 		}
-		const response = await fetch(`${url}/api/user/${userId}/report`, {
+		const response = await fetch(`${url}/user/${userId}/report`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
@@ -274,7 +293,6 @@ export async function reportUser(
 	}
 }
 
-//ADMIN USER
 /**
  * Return the specified user’s profile.
  * @param userId
@@ -282,7 +300,7 @@ export async function reportUser(
  */
 async function getOtherUser(userId: string) {
 	try {
-		const response = await fetch(`${url}/api/user/${userId}`, {
+		const response = await fetch(`${url}/user/${userId}`, {
 			headers: {
 				"Content-Type": "application/json"
 			},
@@ -297,6 +315,7 @@ async function getOtherUser(userId: string) {
 	}
 }
 
+//ADMIN USER
 /**
  * Ban/Unban the specified user. This is an admin-only endpoint.
  * @param userId
@@ -305,7 +324,7 @@ async function getOtherUser(userId: string) {
  */
 async function banAdmin(userId: string, length: number, active: boolean) {
 	try {
-		const response = await fetch(`${url}/api/user/${userId}`, {
+		const response = await fetch(`${url}/user/${userId}`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json"
@@ -326,13 +345,38 @@ async function banAdmin(userId: string, length: number, active: boolean) {
 }
 
 //CONTENT requests
+
+/**
+ * Returns a specified post by its ID
+ *@param postId ID of the post
+ *@returns JSON promise with data on the specified post
+ */
+async function getPost(postId: string) {
+	try {
+		const response = await fetch(`${url}/content/${postId}`, {
+			headers: {
+				"Content-Type": "application/json"
+			},
+			credentials: "include"
+		});
+		if (!response.ok) {
+			throw new Error(`Response status: ${response.status}`);
+		}
+		const result = response.json();
+		console.log(`Getting post status: ${response.status}`);
+		return result;
+	} catch (error) {
+		console.error(error);
+	}
+}
+
 /**
  * Returns the list of posts and comments associated with the current user.
  * @returns Promise of list of posts and comments of current user
  */
 async function getMyPosts() {
 	try {
-		const response = await fetch(`${url}/api/content`, {
+		const response = await fetch(`${url}/content`, {
 			credentials: "include"
 		});
 		if (!response.ok) {
@@ -361,7 +405,7 @@ async function makePost(content: string) {
 			}
 		}
 
-		const response = await fetch(`${url}/api/content/post`, {
+		const response = await fetch(`${url}/content/post`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
@@ -399,19 +443,16 @@ async function reply(content: string, postId: string) {
 			}
 		}
 
-		const response = await fetch(
-			`${url}/api/content/post/${postId}/reply`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "aLplication/json"
-				},
-				credentials: "include",
-				body: JSON.stringify({
-					content: content
-				})
-			}
-		);
+		const response = await fetch(`${url}/content/post/${postId}/reply`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "aLplication/json"
+			},
+			credentials: "include",
+			body: JSON.stringify({
+				content: content
+			})
+		});
 
 		if (!response.ok) {
 			throw new Error(`Response status: ${response.status}`);
@@ -429,15 +470,12 @@ async function reply(content: string, postId: string) {
  */
 async function getReply(postId: string) {
 	try {
-		const response = await fetch(
-			`${url}/api/content/post/${postId}/reply`,
-			{
-				headers: {
-					"Content-Type": "aLplication/json"
-				},
-				credentials: "include"
-			}
-		);
+		const response = await fetch(`${url}/content/post/${postId}/reply`, {
+			headers: {
+				"Content-Type": "aLplication/json"
+			},
+			credentials: "include"
+		});
 		if (!response.ok) {
 			throw new Error(`Response status: ${response.status}`);
 		}
@@ -457,7 +495,7 @@ async function getReply(postId: string) {
  */
 async function getPostsAdmin(userId: string) {
 	try {
-		const response = await fetch(`${url}/api/content/${userId}`, {
+		const response = await fetch(`${url}/content/${userId}`, {
 			headers: {
 				"Content-Type": "aLplication/json"
 			},

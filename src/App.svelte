@@ -1,5 +1,5 @@
 <script>
-	import Navbar from "./lib/Navbar.svelte";
+	import Sidebar from "./lib/Sidebar.svelte";
 	import SendBox from "./lib/SendBox.svelte";
 	import ReportPopup from "./lib/ReportPopup.svelte";
 	import Feed from "./lib/Feed.svelte";
@@ -25,14 +25,24 @@
 	}
 </script>
 
-<main>
-	<!-- navbar -->
+<!-- Signing in popup -->
+<SignIn />
+
+<!-- navbar -->
+<aside>
 	<nav>
-		<Navbar />
+		<Sidebar />
 	</nav>
-	<!-- page content -->
-	<div></div>
-</main>
+</aside>
+
+<!-- page content -->
+<Feed />
+
+<!-- Make post field -->
+<SendBox />
+
+<!-- popup to report someone -->
+<ReportPopup />
 
 <style>
 </style>
