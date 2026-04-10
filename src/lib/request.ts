@@ -14,7 +14,6 @@ const url: string = "http://localhost:3000/api";
  */
 async function getLocation() {
 	let result = await getPosition();
-	let result = await getPosition();
 	try {
 		lat = result.coords.latitude;
 		lon = result.coords.longitude;
@@ -22,9 +21,9 @@ async function getLocation() {
 		if (location == null) {
 			throw new Error("Location is null");
 		}
-		console.log(
-			`Got location: lat: ${location.lat == null ? lat : location.lat}, ${location.lon}`
-		);
+		// console.log(
+		// 	`Got location: lat: ${location.lat == null ? lat : location.lat}, ${location.lon}`
+		// );
 
 		return true;
 	} catch (error: any) {
@@ -131,6 +130,9 @@ export async function signUp(
 				cause: response.status
 			});
 		}
+		//TODO: test access control on sign up
+		console.log(response.headers.get("Access-Control-Allow-Origin"));
+
 		document.cookie = response.headers.get("set-cookie") ?? "";
 	} catch (error: any) {
 		console.error(error);
@@ -173,7 +175,6 @@ export async function getFeed() {
 			}
 		}
 		const response = await fetch(
-			`${url}/feed-spatial?lat=${location.lat}&lon=${location.lon}`,
 			`${url}/feed-spatial?lat=${location.lat}&lon=${location.lon}`,
 			{
 				headers: {
@@ -515,8 +516,6 @@ export async function makePost(content: string) {
 				locality: {
 					lat: location.lat,
 					lon: location.lon
-					lat: location.lat,
-					lon: location.lon
 				}
 			})
 		});
@@ -688,15 +687,6 @@ export async function retrieveGeoLocation(
 				}
 			}
 		);
-		const response = await fetch(
-			`${NOMINATIM_REVERSE_ENDPOINT}?${params}`,
-			{
-				headers: {
-					Accept: "application/json",
-					"User-Agent": "Lilypad-client/1.0 (contact: coursework)"
-				}
-			}
-		);
 		if (!response.ok) {
 			return null;
 		}
@@ -708,7 +698,7 @@ export async function retrieveGeoLocation(
 		if (data.error != null || data.lat == null || data.lon == null) {
 			return null;
 		}
-		console.log(`Location: ${data.lat}, ${data.lon}`);
+		// console.log(`Location: ${data.lat}, ${data.lon}`);
 
 		return {
 			lat: Number.parseFloat(data.lat),

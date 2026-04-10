@@ -3,7 +3,7 @@
 	import { loadMyUser } from "./User.svelte";
 	let signingIn: boolean = $state(true); //
 
-	async function signup() {
+	async function signUpHandler() {
 		const username = <HTMLInputElement>(
 			document.getElementById("usernamesign")
 		);
@@ -16,10 +16,12 @@
 			alert("All fields must be filled to sign up");
 			return;
 		}
-		if (
-			(await signUp(email.value, password.value, username.value)) == 401
-		) {
+		let result = await signUp(email.value, password.value, username.value);
+		if (result == 401) {
 			alert("Unable to Sign Up");
+			username.value = "";
+			email.value = "";
+			password.value = "";
 			return;
 		}
 
@@ -29,7 +31,7 @@
 		return 200;
 	}
 
-	async function login() {
+	async function logInHandler() {
 		const email = <HTMLInputElement>document.getElementById("emaillog");
 		const password = <HTMLInputElement>(
 			document.getElementById("passwordlog")
@@ -63,7 +65,10 @@
 			}}>Log In</button>
 	</div>
 	<div>
-		<form id="signIn" onsubmit={signup} class={signingIn ? "" : "hidden"}>
+		<form
+			id="signIn"
+			onsubmit={signUpHandler}
+			class={signingIn ? "" : "hidden"}>
 			<label>
 				<input type="text" id="usernamesign" placeholder="Username" />
 			</label>
@@ -77,7 +82,10 @@
 				<input type="submit" value="Submit" />
 			</label>
 		</form>
-		<form id="logIn" onsubmit={login} class={signingIn ? "hidden" : ""}>
+		<form
+			id="logIn"
+			onsubmit={logInHandler}
+			class={signingIn ? "hidden" : ""}>
 			<label>
 				<input type="text" id="emaillog" placeholder="Email" />
 			</label>
