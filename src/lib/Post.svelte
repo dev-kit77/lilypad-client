@@ -59,25 +59,23 @@
 
 <div class="post">
 	<p>
-		Type: {type}
-		<br />
-		Post ID: {id}
-		<br />
 		Content: {content}
-		<br />
-		User ID: {userID}
 		<br />
 		Author: {author}
 		<br />
-		Time: {time}
+		Posted on: {new Date(time).toLocaleString()}
 		<br />
-		Updated: {updated}
+		{#if updated != "" && updated != time}
+			Last updated on: {new Date(updated).toLocaleString()}
+			<br />
+		{/if}
+		Upvotes: {upvotes}
 		<br />
-		Upvotes:{upvotes}
-		<br />
-		Replying to: {replyingTo}
-		<br />
-		Reply Count: {replyCount}
+		{#if replyingTo != ""}
+			Replying to: {replyingTo}
+			<br />
+		{/if}
+		Replies: {replyCount}
 	</p>
 	<!-- TODO: get tag if user has upvoted or not -->
 	<div>

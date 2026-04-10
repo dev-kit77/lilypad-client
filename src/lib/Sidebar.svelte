@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { myPosts } from "./Feed.svelte";
 	import { logOut } from "./request.ts";
+	import SignInPopup from "./SignInPopup.svelte";
 </script>
 
 <!-- The Sidebar -->
-<div class="sidebar">// sidebar content</div>
+<div class="sidebar"><SignInPopup /></div>
 
 <style>
 	.sidebar {

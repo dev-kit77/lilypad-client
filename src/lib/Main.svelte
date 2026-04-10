@@ -12,8 +12,6 @@
 <div class="container">
 	<Sidebar />
 	<div class="main">
-		<SignInPopup />
-
 		<SendBox />
 
 		<Feed />
