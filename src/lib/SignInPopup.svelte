@@ -20,7 +20,12 @@
 			(await signUp(email.value, password.value, username.value)) == 401
 		) {
 			alert("Unable to Sign Up");
+			return;
 		}
+
+		username.value = "";
+		email.value = "";
+		password.value = "";
 		return 200;
 	}
 
@@ -37,6 +42,9 @@
 			alert("Unable to Login");
 			return;
 		}
+		await loadMyUser();
+		email.value = "";
+		password.value = "";
 		return 200;
 	}
 </script>
