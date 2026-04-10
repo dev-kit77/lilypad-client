@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { updateFeed } from "./Feed.svelte";
+	import { findUser, updateFeed } from "./Feed.svelte";
 	import Replies from "./Replies.svelte";
 	import { makeUpvote, getPost, reply, updatePost } from "./request.ts";
 
@@ -64,7 +64,8 @@
 	<p>
 		Content: {content}
 		<br />
-		Author: {author}
+		Author:
+		<button id="findUser" onclick={findUser(author)}>{author}</button>
 		<br />
 		Posted on: {new Date(time).toLocaleString()}
 		<br />

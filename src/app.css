@@ -10,14 +10,7 @@ body {
 	background-color: white;
 	border-radius: 25px;
 }
-.sidebar {
-	grid-area: sidebar;
-	position: fixed;
-	height: 100vh;
-	width: 200px;
-	background-color: rgb(181, 181, 181);
-	border-right: 2px solid black;
-}
+
 .refresh {
 	width: fit-content;
 	padding: 2px;
@@ -43,14 +36,23 @@ body {
 
 .container {
 	width: 100%;
+	height: 100vw;
 	display: grid;
 	grid-template-areas: "sidebar main";
 	grid-template-columns: 200px auto;
 }
 .main {
 	grid-area: main;
-	height: 100vh;
+
 	background-color: gray;
+}
+.sidebar {
+	grid-area: sidebar;
+	position: fixed;
+	height: 100vh;
+	width: 200px;
+	background-color: rgb(181, 181, 181);
+	border-right: 2px solid black;
 }
 
 .sign-in-card {
@@ -61,4 +63,8 @@ body {
 label {
 	display: block;
 	margin-top: 10px;
+}
+
+.user {
+	display: block;
 }

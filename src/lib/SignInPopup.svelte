@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { signUp, logIn } from "./request.ts";
+	import { loadMyUser } from "./User.svelte";
 	let signingIn: boolean = $state(true); //
 
 	async function signup() {
