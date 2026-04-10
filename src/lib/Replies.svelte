@@ -1,7 +1,9 @@
-<script lang="ts" module>
+<script lang="ts">
 	import { getReply } from "./request.ts";
 	import Post from "./Post.svelte";
+	import { onMount } from "svelte";
 
+	let { postID, replyCount } = $props();
 	let repliesLoaded: boolean = $state(false);
 	let replies: {
 		id: string;
@@ -15,7 +17,7 @@
 		replyCount: number;
 	}[] = $state([]);
 
-	export async function getReplies(postID: string) {
+	async function getReplies(postID: string) {
 		repliesLoaded = false;
 		const result = await getReply(postID);
 		//check for error
@@ -26,13 +28,23 @@
 		}
 		repliesLoaded = true;
 		replies = result.replies;
-		// console.log(`Replies received: ${JSON.stringify(result)}`);
+		console.log(`Replies received: ${JSON.stringify(result)}`);
 		console.log(`Replies received: 200`);
 		return 200;
 	}
+	function updateReplies() {
+		if (replyCount > 0) {
+			getReplies(postID);
+		}
+	}
 </script>
 
-<!-- TODO FIX REPLIES -->
+{#if replyCount > 0}
+	<div>
+		<button id="{postID}replyFeed" onclick={updateReplies}
+			>Get Replies</button>
+	</div>
+{/if}
 <div id="Feed">
 	<!-- check if replies have been loaded empty -->
 	{#if replies.length == 0 && repliesLoaded}
