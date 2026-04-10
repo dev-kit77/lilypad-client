@@ -14,6 +14,7 @@ const url: string = "http://localhost:3000/api";
  */
 async function getLocation() {
 	let result = await getPosition();
+	let result = await getPosition();
 	try {
 		lat = result.coords.latitude;
 		lon = result.coords.longitude;
@@ -172,6 +173,7 @@ export async function getFeed() {
 			}
 		}
 		const response = await fetch(
+			`${url}/feed-spatial?lat=${location.lat}&lon=${location.lon}`,
 			`${url}/feed-spatial?lat=${location.lat}&lon=${location.lon}`,
 			{
 				headers: {
@@ -513,6 +515,8 @@ export async function makePost(content: string) {
 				locality: {
 					lat: location.lat,
 					lon: location.lon
+					lat: location.lat,
+					lon: location.lon
 				}
 			})
 		});
@@ -664,6 +668,8 @@ export async function retrieveGeoLocation(
 ): Promise<NominatimLatLon | null> {
 	// This makes it possible to retrieve location information
 	//  only up to the village / suburb level
+	// This makes it possible to retrieve location information
+	//  only up to the village / suburb level
 	const zoom = 13;
 	const params = new URLSearchParams({
 		format: "json",
@@ -673,6 +679,15 @@ export async function retrieveGeoLocation(
 	});
 
 	try {
+		const response = await fetch(
+			`${NOMINATIM_REVERSE_ENDPOINT}?${params}`,
+			{
+				headers: {
+					Accept: "application/json",
+					"User-Agent": "Lilypad-client/1.0 (contact: coursework)"
+				}
+			}
+		);
 		const response = await fetch(
 			`${NOMINATIM_REVERSE_ENDPOINT}?${params}`,
 			{
