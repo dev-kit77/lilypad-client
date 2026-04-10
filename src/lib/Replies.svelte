@@ -40,8 +40,8 @@
 </script>
 
 {#if replyCount > 0}
-	<div>
-		<button id="{postID}replyFeed" onclick={updateReplies}
+	<div class="get-reply">
+		<button class="button" id="{postID}replyFeed" onclick={updateReplies}
 			>Get Replies</button>
 	</div>
 {/if}
@@ -67,4 +67,5 @@
 </div>
 
 <style>
+	@import "./src/app.css";
 </style>

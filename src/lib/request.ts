@@ -57,7 +57,7 @@ export async function logOut() {
 		return response.status;
 	} catch (error: any) {
 		console.error(error);
-		return error.cause;
+		return error;
 	}
 }
 

@@ -78,12 +78,11 @@
 		Replies: {replyCount}
 	</p>
 	<!-- TODO: get tag if user has upvoted or not -->
-	<div>
-		<input id="{id}replyBox" placeholder="Type your reply here" />
-		<button id="{id}sendReply" onclick={makeReply}>Send</button>
-		<button id="{id}upvote" onclick={upvote}
-			>{upvoted ? "Upvote" : "Remove Upvote"}</button>
-	</div>
+
+	<input id="{id}replyBox" placeholder="Type your reply here" />
+	<button class="button" id="{id}sendReply" onclick={makeReply}>Send</button>
+	<button class="button" id="{id}upvote" onclick={upvote}
+		>{upvoted ? "Upvote" : "Remove Upvote"}</button>
 </div>
 
 <!-- Replies -->
@@ -94,9 +93,5 @@
 {/if}
 
 <style>
-	.post {
-		width: fit-content;
-		padding: 1rem;
-		border: 4px solid blue;
-	}
+	@import "./src/app.css";
 </style>

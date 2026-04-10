@@ -6,6 +6,7 @@
 	import SettingsPopup from "$lib/SettingsPopup.svelte";
 	import Sidebar from "$lib/Sidebar.svelte";
 	import SignInPopup from "$lib/SignInPopup.svelte";
+
 	// let user;
 </script>
 
@@ -19,15 +20,5 @@
 </div>
 
 <style>
-	.container {
-		width: 100%;
-		display: grid;
-		grid-template-areas: "sidebar main";
-		grid-template-columns: 200px auto;
-	}
-	.main {
-		grid-area: main;
-		height: 100%;
-		background-color: gray;
-	}
+	@import "./src/app.css";
 </style>

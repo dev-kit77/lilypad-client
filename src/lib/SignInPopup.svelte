@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { signUp, logIn } from "./request.ts";
-	let signingIn: boolean = $state(true);
+	let signingIn: boolean = $state(true); //
+
 	async function signup() {
 		const username = <HTMLInputElement>(
 			document.getElementById("usernamesign")
@@ -14,9 +15,14 @@
 			alert("All fields must be filled to sign up");
 			return;
 		}
-		signUp(email.value, password.value, username.value);
+		if (
+			(await signUp(email.value, password.value, username.value)) == 401
+		) {
+			alert("Unable to Sign Up");
+		}
 		return 200;
 	}
+
 	async function login() {
 		const email = <HTMLInputElement>document.getElementById("emaillog");
 		const password = <HTMLInputElement>(
@@ -26,12 +32,16 @@
 			alert("All fields must be filled to log in");
 			return;
 		}
-		logIn(email.value, password.value);
+		if ((await logIn(email.value, password.value)) == 403) {
+			alert("Unable to Login");
+			return;
+		}
 		return 200;
 	}
 </script>
 
-<div id="auth-card">
+<!-- HTML -->
+<div id="auth-card" class="sign-in-card">
 	<div id="authSelector">
 		<button
 			onclick={() => {
@@ -45,22 +55,35 @@
 	</div>
 	<div>
 		<form id="signIn" onsubmit={signup} class={signingIn ? "" : "hidden"}>
-			<input type="text" id="usernamesign" placeholder="Username" />
-			<br />
-			<input type="text" id="emailsign" placeholder="Email" /> <br />
-			<input type="text" id="passwordsign" placeholder="Password" />
-			<br />
-			<input type="submit" value="Sign In" />
+			<label>
+				<input type="text" id="usernamesign" placeholder="Username" />
+			</label>
+			<label>
+				<input type="text" id="emailsign" placeholder="Email" />
+			</label>
+			<label>
+				<input type="text" id="passwordsign" placeholder="Password" />
+			</label>
+			<label>
+				<input type="submit" value="Submit" />
+			</label>
 		</form>
 		<form id="logIn" onsubmit={login} class={signingIn ? "hidden" : ""}>
-			<input type="text" id="emaillog" placeholder="Email" /><br />
-			<input type="text" id="passwordlog" placeholder="Password" /><br />
-			<input type="submit" value="Log In" />
+			<label>
+				<input type="text" id="emaillog" placeholder="Email" />
+			</label>
+			<label>
+				<input type="text" id="passwordlog" placeholder="Password" />
+			</label>
+			<label>
+				<input type="submit" value="Submit" />
+			</label>
 		</form>
 	</div>
 </div>
 
 <style>
+	/* Do not remove this, doesnt work with import */
 	.hidden {
 		display: none;
 	}

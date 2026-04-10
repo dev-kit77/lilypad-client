@@ -47,6 +47,7 @@
 
 			return result;
 		}
+
 		feedLoaded = true;
 		feed = result.posts;
 		console.log("My posts received: 200");
@@ -60,8 +61,9 @@
 		feedLoaded = false;
 		let result = await getFeed();
 		//check for error
-		if (typeof result == "number") {
-			console.error(`Getting feed: ${result}`);
+		if (result == 401) {
+			alert("You need to be logged in to see the feed");
+			console.error(`Getting feed: Not logged in`);
 
 			return result;
 		}
@@ -74,7 +76,7 @@
 </script>
 
 <div class="refresh">
-	<button onclick={updateFeed}>Refresh feed</button>
+	<button onclick={updateFeed} class="button">Refresh feed</button>
 </div>
 
 <div>
@@ -98,11 +100,5 @@
 </div>
 
 <style>
-	.refresh {
-		width: fit-content;
-		padding: 2px;
-		margin: 2px;
-		margin-top: 20px;
-		border: 1px solid black;
-	}
+	@import "./src/app.css";
 </style>

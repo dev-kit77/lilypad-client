@@ -25,16 +25,10 @@
 </script>
 
 <div class="sendField">
-	<input placeholder="Write your post here." id="sendBox" />
-	<button id="sendButton" onclick={send}>Send</button>
+	<input placeholder="Write your post here." id="sendBox" /><br />
+	<button class="button" id="sendButton" onclick={send}>Send</button>
 </div>
 
 <style>
-	.sendField {
-		display: block;
-		padding: 2px;
-		margin: 2px;
-		border: 2px solid black;
-		width: fit-content;
-	}
+	@import "./src/app.css";
 </style>
