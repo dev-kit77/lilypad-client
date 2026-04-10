@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { findUser, updateFeed } from "./Feed.svelte";
 	import Replies from "./Replies.svelte";
-	import { makeUpvote, getPost, reply, updatePost } from "./request.ts";
+	import { makeUpvote, reply, updatePost } from "./request.ts";
 
 	let upvoted: boolean = $state(false);
 
@@ -56,6 +56,15 @@
 		}
 	}
 
+	//TODO updating post
+
+	/**
+	 * Find user of this post
+	 */
+	async function getUserFromPost() {
+		findUser(author);
+	}
+
 	//TODO implement reporting
 	async function report() {}
 </script>
@@ -65,7 +74,7 @@
 		Content: {content}
 		<br />
 		Author:
-		<button id="findUser" onclick={findUser(author)}>{author}</button>
+		<button id="findUser" onclick={getUserFromPost}>{author}</button>
 		<br />
 		Posted on: {new Date(time).toLocaleString()}
 		<br />

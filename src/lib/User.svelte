@@ -54,12 +54,9 @@
 			active: 0
 		};
 	}
-
-	onMount(() => {
-		loadMyUser();
-	});
 </script>
 
+<button class="button" onclick={loadMyUser}>Refresh User</button>
 {#if !(user.username == "")}
 	<div class="user">
 		<h3 id="user-name">Name: {user.username}</h3>

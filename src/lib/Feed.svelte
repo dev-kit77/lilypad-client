@@ -64,6 +64,8 @@
 		}
 
 		feedLoaded = true;
+		console.log(result);
+
 		feed = result.posts;
 		console.log("My posts received: 200");
 		return 200;
@@ -117,7 +119,7 @@
 {#if feedPosts}
 	<div>
 		<!-- check if feed has been loaded empty -->
-		{#if feed.length == 0 && feedLoaded}
+		{#if feed == undefined && feedLoaded}
 			<div>
 				<p>No Posts yet, maybe you could be the first.</p>
 			</div>

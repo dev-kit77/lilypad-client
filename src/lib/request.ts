@@ -3,7 +3,7 @@ import { getPosition } from "./geodude.ts";
 
 var lat: number;
 var lon: number;
-
+let location: NominatimLatLon | null = null;
 //URL to api
 const url: string = "http://localhost:3000/api";
 
@@ -13,10 +13,18 @@ const url: string = "http://localhost:3000/api";
  * @returns True if it successfully got the users location, False otherwise
  */
 async function getLocation() {
-	let position = await getPosition();
+	let result = await getPosition();
 	try {
-		lat = position.coords.latitude;
-		lon = position.coords.longitude;
+		lat = result.coords.latitude;
+		lon = result.coords.longitude;
+		location = await retrieveGeoLocation(lat, lon);
+		if (location == null) {
+			throw new Error("Location is null");
+		}
+		console.log(
+			`Got location: lat: ${location.lat == null ? lat : location.lat}, ${location.lon}`
+		);
+
 		return true;
 	} catch (error: any) {
 		console.error(`Cannot get Location: ${error}`);
@@ -157,13 +165,14 @@ export async function ping() {
  */
 export async function getFeed() {
 	try {
-		if (!lat || !lon) {
-			if (!(await getLocation())) {
+		if (location == null) {
+			getLocation();
+			if (location == null) {
 				throw new Error(`Cannot get location`, { cause: 400 });
 			}
 		}
 		const response = await fetch(
-			`${url}/feed-spatial?lat=${lat}&lon=${lon}`,
+			`${url}/feed-spatial?lat=${location.lat}&lon=${location.lon}`,
 			{
 				headers: {
 					"Content-Type": "application/json"
@@ -177,6 +186,8 @@ export async function getFeed() {
 				cause: response.status
 			});
 		}
+		console.log(`Retreiving Feed`);
+
 		const result = await response.json();
 		return result;
 	} catch (error: any) {
@@ -484,8 +495,9 @@ export async function getMyPosts() {
  */
 export async function makePost(content: string) {
 	try {
-		if (!lat || !lon) {
-			if (!(await getLocation())) {
+		if (location == null) {
+			getLocation();
+			if (location == null) {
 				throw new Error(`Cannot get location`, { cause: 400 });
 			}
 		}
@@ -499,8 +511,8 @@ export async function makePost(content: string) {
 			body: JSON.stringify({
 				content: content,
 				locality: {
-					lat: lat,
-					lon: lon
+					lat: location.lat,
+					lon: location.lon
 				}
 			})
 		});
@@ -650,8 +662,8 @@ export async function retrieveGeoLocation(
 	lat: number,
 	lon: number
 ): Promise<NominatimLatLon | null> {
-    // This makes it possible to retrieve location information
-    //  only up to the village / suburb level
+	// This makes it possible to retrieve location information
+	//  only up to the village / suburb level
 	const zoom = 13;
 	const params = new URLSearchParams({
 		format: "json",
@@ -661,12 +673,15 @@ export async function retrieveGeoLocation(
 	});
 
 	try {
-		const response = await fetch(`${NOMINATIM_REVERSE_ENDPOINT}?${params}`, {
-			headers: {
-				Accept: "application/json",
-				"User-Agent": "Lilypad-client/1.0 (contact: coursework)"
+		const response = await fetch(
+			`${NOMINATIM_REVERSE_ENDPOINT}?${params}`,
+			{
+				headers: {
+					Accept: "application/json",
+					"User-Agent": "Lilypad-client/1.0 (contact: coursework)"
+				}
 			}
-		});
+		);
 		if (!response.ok) {
 			return null;
 		}
@@ -678,12 +693,14 @@ export async function retrieveGeoLocation(
 		if (data.error != null || data.lat == null || data.lon == null) {
 			return null;
 		}
+		console.log(`Location: ${data.lat}, ${data.lon}`);
+
 		return {
 			lat: Number.parseFloat(data.lat),
 			lon: Number.parseFloat(data.lon)
 		};
 	} catch (error: any) {
-		console.error(error);
+		console.error(`NOMINATIM ERROR${error}`);
 		return null;
 	}
 }
