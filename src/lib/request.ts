@@ -130,8 +130,6 @@ export async function signUp(
 				cause: response.status
 			});
 		}
-		//TODO: test access control on sign up
-		console.log(response.headers.get("Access-Control-Allow-Origin"));
 
 		document.cookie = response.headers.get("set-cookie") ?? "";
 	} catch (error: any) {

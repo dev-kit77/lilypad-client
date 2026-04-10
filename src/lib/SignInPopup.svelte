@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { signUp, logIn } from "./request.ts";
 	import { loadMyUser } from "./User.svelte";
-	let signingIn: boolean = $state(true); //
+	let signingIn: boolean = $state(true); // change the form to show signup form or login form
 
 	async function signUpHandler() {
 		const username = <HTMLInputElement>(
