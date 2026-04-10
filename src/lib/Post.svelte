@@ -55,6 +55,9 @@
 			return;
 		}
 	}
+
+	//TODO implement reporting
+	async function report() {}
 </script>
 
 <div class="post">

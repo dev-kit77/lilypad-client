@@ -2,7 +2,7 @@
 	import { myPosts } from "./Feed.svelte";
 	import { logOut } from "./request.ts";
 	import SignInPopup from "./SignInPopup.svelte";
-
+	import User from "./User.svelte";
 	let visible = $state(false); // is the logout message visible
 
 	async function handleLogOut() {
@@ -18,6 +18,7 @@
 
 <!-- The Sidebar -->
 <div class="sidebar">
+	<User />
 	<SignInPopup />
 
 	<button id="logout" onclick={handleLogOut} class="button"> LogOut </button>
