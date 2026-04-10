@@ -1,8 +1,7 @@
 <script lang="ts">
+	import Main from "$lib/Main.svelte";
+	import Admin from "$lib/Admin.svelte";
 </script>
 
-<!-- Admin page -->
-
-<h1 id="he">Admin page (work in progress)</h1>
-
-<a href="../">go back to being a REGULAR BORING USER</a>
+<Main />
+<Admin />

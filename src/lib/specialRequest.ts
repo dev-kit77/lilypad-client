@@ -5,9 +5,14 @@ const url: string = "http://localhost:3000/api";
 
 //ADMIN USER
 
+/**
+ * Return the list of posts and comments associated with the specified user. This is an admin-only endpoint.
+ * @param userId
+ * @returns
+ */
 export async function getUser(userId: string) {
 	try {
-		const response = await fetch(`${url}/content/${userId}`, {
+		const response = await fetch(`${url}/content/user/${userId}`, {
 			headers: {
 				"Content-Type": "application/json"
 			},
@@ -54,6 +59,7 @@ export async function banUser(
 			});
 		}
 		console.log(`BanHammer: ${response.status}`);
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -117,7 +123,6 @@ export async function getReport(reportId: string) {
  * @param reportId
  * @param resolved Optional Mark this Report as resolved or not
  * @param action Optional update the action taken on this Report
- * @returns Promise containing the Report
  */
 export async function updateReport(
 	reportId: string,
@@ -137,9 +142,8 @@ export async function updateReport(
 				cause: response.status
 			});
 		}
-		const result = response.json();
 		console.log(`Update Report status: ${response.status}`);
-		return result;
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;

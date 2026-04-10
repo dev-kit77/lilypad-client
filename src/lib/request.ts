@@ -1,3 +1,4 @@
+import { browser } from "$app/environment";
 import { getPosition } from "./geodude.ts";
 
 var lat: number;
@@ -7,20 +8,26 @@ var lon: number;
 const url: string = "http://localhost:3000/api";
 
 //getting POSITION
+/**
+ * Gets the users location
+ * @returns True if it successfully got the users location, False otherwise
+ */
 async function getLocation() {
 	let position = await getPosition();
 	try {
 		lat = position.coords.latitude;
 		lon = position.coords.longitude;
+		return true;
 	} catch (error: any) {
 		console.error(`Cannot get Location: ${error}`);
+		return false;
 	}
 }
 
 //CHECK SESSION
 /**
- *
- * @returns true if the session is active, false otherwise
+ * Refreshes the session token
+ * @returns true if the session is active, false if it was unable to refresh the token
  */
 export async function checkSession() {
 	try {
@@ -46,6 +53,8 @@ export async function logOut() {
 			},
 			credentials: "include"
 		});
+
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -61,7 +70,7 @@ export async function logOut() {
  */
 export async function logIn(email: string, password: string) {
 	try {
-		const response = await fetch(`${url}/auth/sign-in`, {
+		const response = await fetch(`${url}/auth/sign-in/email`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
@@ -74,8 +83,7 @@ export async function logIn(email: string, password: string) {
 				cause: response.status
 			});
 		}
-		const result = response.json();
-		return result;
+		document.cookie = response.headers.get("set-cookie") ?? "";
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -96,7 +104,7 @@ export async function signUp(
 	username: string
 ) {
 	try {
-		const response = await fetch(`${url}/auth/sign-up`, {
+		const response = await fetch(`${url}/auth/sign-up/email`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
@@ -110,12 +118,11 @@ export async function signUp(
 		});
 
 		if (!response.ok) {
-			throw new Error(`Response status: ${response.status}`, {
+			throw new Error(`Response status: ${response.statusText}`, {
 				cause: response.status
 			});
 		}
-		const result = await response.json();
-		return result;
+		document.cookie = response.headers.get("set-cookie") ?? "";
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -136,6 +143,7 @@ export async function ping() {
 		}
 		const result = await response.json();
 		console.log(result);
+		return response.json;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -145,15 +153,23 @@ export async function ping() {
 //FEED request
 /**
  *Return a list of posts filtered by locality.
- * @returns json Promise containing an array of Posts
+ * @returns json Promise containing an array of Posts or status code
  */
 export async function getFeed() {
 	try {
 		if (!lat || !lon) {
-			getLocation();
+			if (!(await getLocation())) {
+				throw new Error(`Cannot get location`, { cause: 400 });
+			}
 		}
 		const response = await fetch(
-			`${url}/feed-spatial?lat=${lat}&lon=${lon}`
+			`${url}/feed-spatial?lat=${lat}&lon=${lon}`,
+			{
+				headers: {
+					"Content-Type": "application/json"
+				},
+				credentials: "include"
+			}
 		);
 
 		if (!response.ok) {
@@ -161,7 +177,7 @@ export async function getFeed() {
 				cause: response.status
 			});
 		}
-		const result = response.json();
+		const result = await response.json();
 		return result;
 	} catch (error: any) {
 		console.error(error);
@@ -188,7 +204,7 @@ export async function getMyUser() {
 				cause: response.status
 			});
 		}
-		const result = response.json();
+		const result = await response.json();
 		return result;
 	} catch (error: any) {
 		console.error(error);
@@ -213,7 +229,7 @@ export async function getUserFull() {
 				cause: response.status
 			});
 		}
-		const result = response.json();
+		const result = await response.json();
 		console.log(`GDPR get all data status: ${response.status}`);
 
 		return result;
@@ -250,6 +266,8 @@ export async function updateUser(params: {
 		}
 		const result = await response.json();
 		console.log(result);
+		// return result;
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -272,6 +290,7 @@ export async function deleteUser() {
 		}
 		const result = await response.json();
 		console.log(result);
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -309,6 +328,7 @@ export async function reportPost(
 			});
 		}
 		console.log(`Report: ${response.status}`);
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -345,7 +365,7 @@ export async function reportUser(
 			});
 		}
 		console.log(`Report: ${response.status}`);
-		return 200;
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -371,7 +391,7 @@ export async function getUser(userId: string) {
 			});
 		}
 		console.log(`Fetch user: ${response.status}`);
-		return 200;
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -381,8 +401,8 @@ export async function getUser(userId: string) {
 //CONTENT requests
 
 /**
- * Returns a specified post by its ID
- *@param postId ID of the post
+ * Returns a specified post by its CUID
+ *@param postId CUID of the post
  *@returns JSON promise with data on the specified post
  */
 export async function getPost(postId: string) {
@@ -398,9 +418,35 @@ export async function getPost(postId: string) {
 				cause: response.status
 			});
 		}
-		const result = response.json();
+		const result = await response.json();
 		console.log(`Getting post status: ${response.status}`);
 		return result;
+	} catch (error: any) {
+		console.error(error);
+		return error.cause;
+	}
+}
+
+/**
+ * Delete a Post.
+ * @param postId
+ */
+export async function deletePost(postId: string) {
+	try {
+		const response = await fetch(`${url}/content/post/${postId}`, {
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			credentials: "include"
+		});
+		if (!response.ok) {
+			throw new Error(`Response status: ${response.status}`, {
+				cause: response.status
+			});
+		}
+		console.log(`Getting post status: ${response.status}`);
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -421,7 +467,7 @@ export async function getMyPosts() {
 				cause: response.status
 			});
 		}
-		const result = response.json();
+		const result = await response.json();
 		console.log(`Get my posts: ${response.status}`);
 
 		return result;
@@ -439,11 +485,8 @@ export async function getMyPosts() {
 export async function makePost(content: string) {
 	try {
 		if (!lat || !lon) {
-			await getLocation();
-			if (!lat || !lon) {
-				throw new Error("Cannot get Location to make post.", {
-					cause: 400
-				});
+			if (!(await getLocation())) {
+				throw new Error(`Cannot get location`, { cause: 400 });
 			}
 		}
 
@@ -468,6 +511,7 @@ export async function makePost(content: string) {
 			});
 		}
 		console.log(`Post: ${response.status}`);
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -498,6 +542,7 @@ export async function updatePost(content: string, postId: string) {
 			});
 		}
 		console.log(`Updating post status: ${response.status}`);
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -513,7 +558,7 @@ export async function reply(content: string, postId: string) {
 		const response = await fetch(`${url}/content/post/${postId}/reply`, {
 			method: "POST",
 			headers: {
-				"Content-Type": "aLplication/json"
+				"Content-Type": "application/json"
 			},
 			credentials: "include",
 			body: JSON.stringify({
@@ -527,6 +572,7 @@ export async function reply(content: string, postId: string) {
 			});
 		}
 		console.log(`Reply: ${response.status}`);
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;
@@ -542,7 +588,7 @@ export async function getReply(postId: string) {
 	try {
 		const response = await fetch(`${url}/content/post/${postId}/reply`, {
 			headers: {
-				"Content-Type": "aLplication/json"
+				"Content-Type": "application/json"
 			},
 			credentials: "include"
 		});
@@ -551,9 +597,37 @@ export async function getReply(postId: string) {
 				cause: response.status
 			});
 		}
-		const result = response.json();
+		const result = await response.json();
 		console.log(`Get Replies to ${postId} status: ${response.status}`);
 		return result;
+	} catch (error: any) {
+		console.error(error);
+		return error.cause;
+	}
+}
+
+/**
+ * Upvote a Post.
+ * @param postId
+ * @returns status code
+ */
+export async function makeUpvote(postId: string) {
+	try {
+		const response = await fetch(`${url}/content/post/${postId}/upvote`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			credentials: "include"
+		});
+		if (!response.ok) {
+			throw new Error(`Response status: ${response.statusText}`, {
+				cause: response.status
+			});
+		}
+		// const result = await response.json();
+		console.log(`Make Upvote to ${postId} status: ${response.status}`);
+		return response.status;
 	} catch (error: any) {
 		console.error(error);
 		return error.cause;

@@ -4,7 +4,13 @@
  */
 export function getPosition(): Promise<GeolocationPosition> {
 	// Simple wrapper
-	return new Promise((res, rej) => {
-		navigator.geolocation.getCurrentPosition(res, rej);
+	return new Promise((resolve, reject) => {
+		if (!navigator.geolocation) {
+			reject(new Error(`no geolocation`));
+			return;
+		}
+		navigator.geolocation.getCurrentPosition(resolve, reject, {
+			timeout: 5000
+		});
 	});
 }
