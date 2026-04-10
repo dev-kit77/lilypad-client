@@ -633,3 +633,57 @@ export async function makeUpvote(postId: string) {
 		return error.cause;
 	}
 }
+
+const NOMINATIM_REVERSE_ENDPOINT =
+	"https://nominatim.openstreetmap.org/reverse";
+
+export type NominatimLatLon = {
+	lat: number;
+	lon: number;
+};
+
+/**
+ * Retrieve geolocation coordinates through the Nominatim API and returns latitude and longitude.
+ * API docs: https://nominatim.org/release-docs/latest/api/Reverse/
+ */
+export async function retrieveGeoLocation(
+	lat: number,
+	lon: number
+): Promise<NominatimLatLon | null> {
+    // This makes it possible to retrieve location information
+    //  only up to the village / suburb level
+	const zoom = 13;
+	const params = new URLSearchParams({
+		format: "json",
+		lat: String(lat),
+		lon: String(lon),
+		zoom: String(zoom)
+	});
+
+	try {
+		const response = await fetch(`${NOMINATIM_REVERSE_ENDPOINT}?${params}`, {
+			headers: {
+				Accept: "application/json",
+				"User-Agent": "Lilypad-client/1.0 (contact: coursework)"
+			}
+		});
+		if (!response.ok) {
+			return null;
+		}
+		const data = (await response.json()) as {
+			error?: string;
+			lat?: string;
+			lon?: string;
+		};
+		if (data.error != null || data.lat == null || data.lon == null) {
+			return null;
+		}
+		return {
+			lat: Number.parseFloat(data.lat),
+			lon: Number.parseFloat(data.lon)
+		};
+	} catch (error: any) {
+		console.error(error);
+		return null;
+	}
+}
