@@ -10,7 +10,7 @@ const url: string = "http://localhost:3000/api";
  * @param userId
  * @returns
  */
-export async function getUser(userId: string) {
+export async function getUserAdmin(userId: string) {
 	try {
 		const response = await fetch(`${url}/content/user/${userId}`, {
 			headers: {
