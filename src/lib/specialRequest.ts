@@ -169,7 +169,7 @@ export async function getUserPostsAdmin(userId: string) {
         cause: response.status,
       });
     }
-    const result = response.json();
+    const result = await response.json();
     console.log(
       `Get Posts and Replies from ${userId} status: ${response.status}`,
     );
