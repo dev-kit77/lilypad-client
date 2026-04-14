@@ -1,8 +1,8 @@
 <!-- The "Posting" box -->
 
 <script lang="ts">
-    import { updateFeed } from "./Feed.svelte";
-    import { makePost } from "./request.ts";
+    import { updateFeed } from "../feed/feed.svelte";
+    import { makePost } from "../ts-lib/request";
 
     /**
      * Make a Post
@@ -30,5 +30,5 @@
 </div>
 
 <style>
-    @import "./app.css";
+    @import "../css/app.css";
 </style>

@@ -1,4 +1,3 @@
-import { browser } from "$app/environment";
 import { getPosition } from "./geodude.ts";
 
 var lat: number;

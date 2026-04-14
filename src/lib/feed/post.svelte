@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { findUser, updateFeed } from "./Feed.svelte";
-    import Replies from "./Replies.svelte";
-    import { makeUpvote, reply, updatePost } from "./request.ts";
+    import { findUser, updateFeed } from "./feed.svelte";
+    import Replies from "./replies.svelte";
+    import { makeUpvote, reply, updatePost } from "../ts-lib/request";
 
     let upvoted: boolean = $state(false);
 
@@ -107,5 +107,5 @@
 {/if}
 
 <style>
-    @import "./app.css";
+    @import "../css/app.css";
 </style>

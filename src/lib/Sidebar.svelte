@@ -1,9 +1,7 @@
 <script lang="ts">
-    import { unmount } from "svelte";
-    import { myPosts } from "./Feed.svelte";
-    import { logOut } from "./request.ts";
-    import SignInPopup from "./SignInPopup.svelte";
-    import User, { clearUser } from "./User.svelte";
+    import { logOut } from "./ts-lib/request";
+    import SignInPopup from "./popups/login.svelte";
+    import User, { clearUser } from "./user.svelte";
 
     let visible = $state(false); // is the logout message visible
 
@@ -35,5 +33,5 @@
 </div>
 
 <style>
-    @import "./app.css";
+    @import "./css/app.css";
 </style>

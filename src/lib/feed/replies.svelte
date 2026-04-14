@@ -1,7 +1,6 @@
 <script lang="ts">
-    import { getReply } from "./request.ts";
-    import Post from "./Post.svelte";
-    import { onMount } from "svelte";
+    import { getReply } from "../ts-lib/request";
+    import Post from "./post.svelte";
 
     let { postID, replyCount } = $props();
     let repliesLoaded: boolean = $state(false);
@@ -68,5 +67,5 @@
 </div>
 
 <style>
-    @import "./app.css";
+    @import "../css/app.css";
 </style>

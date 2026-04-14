@@ -1,11 +1,11 @@
 <!-- User Page -->
 <script lang="ts">
-    import Feed from "$lib/Feed.svelte";
-    import ReportPopup from "$lib/ReportPopup.svelte";
-    import SendBox from "$lib/SendBox.svelte";
-    import SettingsPopup from "$lib/SettingsPopup.svelte";
-    import Sidebar from "$lib/Sidebar.svelte";
-    import SignInPopup from "$lib/SignInPopup.svelte";
+    import Feed from "./feed/feed.svelte";
+    import ReportPopup from "./popups/reportCreate.svelte";
+    import SendBox from "./popups/postCreate.svelte";
+    import SettingsPopup from "./popups/settings.svelte";
+    import Sidebar from "./sidebar.svelte";
+    import SignInPopup from "./popups/login.svelte";
 
     // let user;
 </script>
@@ -20,5 +20,5 @@
 </div>
 
 <style>
-    @import "./app.css";
+    @import "./css/app.css";
 </style>

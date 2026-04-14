@@ -1,6 +1,6 @@
 <script lang="ts" module>
-    import Post from "./Post.svelte";
-    import { getFeed, getMyPosts, getPost, getUser } from "./request.ts";
+    import Post from "./post.svelte";
+    import { getFeed, getMyPosts, getPost, getUser } from "../ts-lib/request";
 
     let feedPosts: boolean = $state(true); // whether the feed shows posts or user information
 
@@ -143,5 +143,5 @@
 {/if}
 
 <style>
-    @import "./app.css";
+    @import "../css/app.css";
 </style>

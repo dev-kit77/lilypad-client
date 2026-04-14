@@ -1,9 +1,8 @@
 <script lang="ts" module>
-    import { onMount } from "svelte";
-    import { myPosts } from "./Feed.svelte";
+    import { myPosts } from "./feed/feed.svelte";
 
     //TODO implement user
-    import { getMyUser, getUser, getUserFull } from "./request.ts";
+    import { getMyUser } from "./ts-lib/request";
 
     let user: {
         userId: string;
@@ -69,5 +68,5 @@
 {/if}
 
 <style>
-    @import "./app.css";
+    @import "./css/app.css";
 </style>
