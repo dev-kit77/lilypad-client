@@ -1,10 +1,13 @@
 import { getPosition } from "./geodude.ts";
 
-var lat: number;
-var lon: number;
 let location: NominatimLatLon | null = null;
+
 //URL to api
-const url: string = "http://localhost:3000/api";
+const url: string = process.env.API?.toString() ?? "";
+
+if (url === "") {
+  throw new Error("API URL is not set");
+}
 
 //getting POSITION
 /**
