@@ -1,39 +1,37 @@
 <script lang="ts">
-	import { unmount } from "svelte";
-	import { myPosts } from "./Feed.svelte";
-	import { logOut } from "./request.ts";
-	import SignInPopup from "./SignInPopup.svelte";
-	import User, { clearUser } from "./User.svelte";
+    import { logOut } from "./ts-lib/request";
+    import SignInPopup from "./popups/login.svelte";
+    import User, { clearUser } from "./user.svelte";
 
-	let visible = $state(false); // is the logout message visible
+    let visible = $state(false); // is the logout message visible
 
-	async function handleLogOut() {
-		const result = await logOut(); //make the request
-		console.log(`Logging Out: ${result}`);
+    async function handleLogOut() {
+        const result = await logOut(); //make the request
+        console.log(`Logging Out: ${result}`);
 
-		//clear user
-		clearUser();
-		// show that the user has logged out for 3 seconds
-		visible = true;
-		setTimeout(() => {
-			visible = false;
-		}, 3000);
-	}
+        //clear user
+        clearUser();
+        // show that the user has logged out for 3 seconds
+        visible = true;
+        setTimeout(() => {
+            visible = false;
+        }, 3000);
+    }
 </script>
 
 <!-- The Sidebar -->
 <div class="sidebar">
-	<User />
-	<SignInPopup />
+    <User />
+    <SignInPopup />
 
-	<button id="logout" onclick={handleLogOut} class="button"> LogOut </button>
-	{#if visible}
-		<p style="color: red; background-color: darkslategrey;">
-			You have been logged out
-		</p>
-	{/if}
+    <button id="logout" onclick={handleLogOut} class="button"> LogOut </button>
+    {#if visible}
+        <p style="color: red; background-color: darkslategrey;">
+            You have been logged out
+        </p>
+    {/if}
 </div>
 
 <style>
-	@import "./src/app.css";
+    @import "./css/app.css";
 </style>
