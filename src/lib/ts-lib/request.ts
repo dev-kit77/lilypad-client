@@ -2,7 +2,7 @@ import { getPosition } from "./geodude.ts";
 
 var lat: number;
 var lon: number;
-let location: NominatimLatLon | null = null;
+let location: NominatimLatLon | null;
 //URL to api
 const url: string = "http://localhost:3000/api";
 
@@ -12,22 +12,21 @@ const url: string = "http://localhost:3000/api";
  * @returns True if it successfully got the users location, False otherwise
  */
 async function getLocation() {
-  let result = await getPosition();
-  try {
-    const location = await retrieveGeoLocation(
-      result.coords.latitude,
-      result.coords.longitude,
-    );
+  let currLocation: NominatimLatLon | null;
 
-    if (!location) {
-      throw new Error("Location is null");
-    }
+  let res = await getPosition();
 
-    return true;
-  } catch (e) {
-    console.error(`Cannot get Location: ${e}`);
-    return false;
+  currLocation = await retrieveGeoLocation(
+    res.coords.latitude,
+    res.coords.longitude,
+  );
+
+  if (!currLocation) {
+    location = null;
+    throw new Error("Location is null");
   }
+
+  return currLocation;
 }
 
 //CHECK SESSION
@@ -166,10 +165,12 @@ export async function ping() {
  */
 export async function getFeed() {
   try {
-    if (location == null) {
-      await getLocation();
-      if (location == null) {
-        throw new Error(`Cannot get location`, { cause: 400 });
+    if (location === null) {
+      try {
+        location = await getLocation();
+      } catch (e: any) {
+        console.error(e);
+        return e.cause;
       }
     }
     const res = await fetch(
@@ -496,10 +497,12 @@ export async function getMyPosts() {
  */
 export async function makePost(content: string) {
   try {
-    if (location == null) {
-      await getLocation();
-      if (location == null) {
-        throw new Error(`Cannot get location`, { cause: 400 });
+    if (location === null) {
+      try {
+        location = await getLocation();
+      } catch (e: any) {
+        console.error(e);
+        return e.cause;
       }
     }
 
