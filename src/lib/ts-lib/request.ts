@@ -1,7 +1,5 @@
 import { getPosition } from "./geodude.ts";
 
-var lat: number;
-var lon: number;
 let location: NominatimLatLon | null;
 //URL to api
 const url: string = "http://localhost:3000/api";
@@ -22,7 +20,6 @@ async function getLocation() {
   );
 
   if (!currLocation) {
-    location = null;
     throw new Error("Location is null");
   }
 
@@ -51,50 +48,46 @@ export async function checkSession() {
  * Logs the user out
  */
 export async function logOut() {
-  try {
-    const res = await fetch(`${url}/auth/sign-out`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
+  const res = await fetch(`${url}/auth/sign-out`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
 
-    return res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e;
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
+    });
   }
+
+  return await res.json();
 }
 
 //LOGGING IN
 /**
  * @param email
  * @param password
- * @returns data of the user
+ * @returns json response
  */
 export async function logIn(email: string, password: string) {
-  try {
-    const res = await fetch(`${url}/auth/sign-in/email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ email: email, password: password }),
+  const res = await fetch(`${url}/auth/sign-in/email`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ email: email, password: password }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
     });
-
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.statusText,
-      });
-    }
-
-    return await res.json();
-  } catch (e: any) {
-    console.error(e.cause);
-    return e;
   }
+
+  return await res.json();
 }
 
 //SIGNING UP
@@ -110,32 +103,26 @@ export async function signUp(
   password: string,
   username: string,
 ) {
-  try {
-    const res = await fetch(`${url}/auth/sign-up/email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        email: email,
-        password: password,
-        name: username,
-      }),
+  const res = await fetch(`${url}/auth/sign-up/email`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      email: email,
+      password: password,
+      name: username,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
     });
-
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.statusText}`, {
-        cause: res.status,
-      });
-    }
-
-    document.cookie = res.headers.get("set-cookie") ?? "";
-    return await res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e.status;
   }
+
+  return res.json();
 }
 
 // PING the api
@@ -143,20 +130,15 @@ export async function signUp(
  * pings the api and logs the status code (like ok: 200)
  */
 export async function ping() {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    const result = await res.json();
-    console.log(result);
-    return res.json;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
+    });
   }
+
+  return await res.json();
 }
 
 //FEED request
@@ -165,38 +147,32 @@ export async function ping() {
  * @returns json Promise containing an array of Posts or status code
  */
 export async function getFeed() {
-  try {
-    if (location === null) {
-      try {
-        location = await getLocation();
-      } catch (e: any) {
-        console.error(e);
-        return e.cause;
-      }
+  if (location === null) {
+    try {
+      location = await getLocation();
+    } catch (e: any) {
+      console.error(e);
+      return e.cause;
     }
-    const res = await fetch(
-      `${url}/feed-spatial?lat=${location.lat}&lon=${location.lon}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      },
-    );
-
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    console.log(`Retreiving Feed`);
-
-    const result = await res.json();
-    return result;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
   }
+
+  const res = await fetch(
+    `${url}/feed-spatial?lat=${location.lat}&lon=${location.lon}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
+    });
+  }
+
+  return await res.json();
 }
 
 //USER requests
@@ -205,25 +181,20 @@ export async function getFeed() {
  * @returns current user's profile and settings
  */
 export async function getMyUser() {
-  try {
-    const res = await fetch(`${url}/user`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
+  const res = await fetch(`${url}/user`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
 
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    const result = await res.json();
-    return result;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
+    });
   }
+
+  return await res.json();
 }
 
 /**
@@ -231,26 +202,20 @@ export async function getMyUser() {
  * @returns all data associated with the current user
  */
 export async function getUserFull() {
-  try {
-    const res = await fetch(`${url}/user/gdpr-sar`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    const result = await res.json();
-    console.log(`GDPR get all data status: ${res.status}`);
+  const res = await fetch(`${url}/user/gdpr-sar`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
 
-    return result;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
+    });
   }
+
+  return await res.json();
 }
 
 /**
@@ -263,52 +228,40 @@ export async function updateUser(params: {
   status?: string;
   settings?: { dark?: boolean; anon?: boolean };
 }) {
-  try {
-    const res = await fetch(`${url}/user`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(params),
-    });
+  const res = await fetch(`${url}/user`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(params),
+  });
 
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    const result = await res.json();
-    console.log(result);
-    // return result;
-    return res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
+  if (!res.ok) {
+    throw new Error(`Response status: ${res.status}`, {
+      cause: res.status,
+    });
   }
+
+  return await res.json();
 }
 
 /**
  * Delete the current user account by anonymising identity while preserving authored content.
  */
 export async function deleteUser() {
-  try {
-    const res = await fetch(`${url}/user`, {
-      method: "DELETE",
-      credentials: "include",
+  const res = await fetch(`${url}/user`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
     });
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    const result = await res.json();
-    console.log(result);
-    return res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
   }
+
+  return await res.json();
 }
 
 //REPORTING
@@ -327,26 +280,22 @@ export async function reportPost(
     action?: string;
   },
 ) {
-  try {
-    const res = await fetch(`${url}/content/post/${postId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(params),
+  const res = await fetch(`${url}/content/post/${postId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(params),
+  });
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
     });
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    console.log(`Report: ${res.status}`);
-    return res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
   }
+
+  return await res.json();
 }
 
 /**
@@ -364,26 +313,22 @@ export async function reportUser(
     action?: string;
   },
 ) {
-  try {
-    const res = await fetch(`${url}/user/${userId}/report`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(param),
+  const res = await fetch(`${url}/user/${userId}/report`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(param),
+  });
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
     });
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    console.log(`Report: ${res.status}`);
-    return res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
   }
+
+  return await res.json();
 }
 
 /**
@@ -392,24 +337,20 @@ export async function reportUser(
  * @return the specified user's data
  */
 export async function getUser(userId: string) {
-  try {
-    const res = await fetch(`${url}/user/${userId}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
+  const res = await fetch(`${url}/user/${userId}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
     });
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    console.log(`Fetch user: ${res.status}`);
-    return res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
   }
+
+  return await res.json();
 }
 
 //CONTENT requests
@@ -420,25 +361,20 @@ export async function getUser(userId: string) {
  *@returns JSON promise with data on the specified post
  */
 export async function getPost(postId: string) {
-  try {
-    const res = await fetch(`${url}/content/${postId}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
+  const res = await fetch(`${url}/content/${postId}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
     });
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    const result = await res.json();
-    console.log(`Getting post status: ${res.status}`);
-    return result;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
   }
+
+  return await res.json();
 }
 
 /**
@@ -446,25 +382,21 @@ export async function getPost(postId: string) {
  * @param postId
  */
 export async function deletePost(postId: string) {
-  try {
-    const res = await fetch(`${url}/content/post/${postId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
+  const res = await fetch(`${url}/content/post/${postId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
     });
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    console.log(`Getting post status: ${res.status}`);
-    return res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
   }
+
+  return await res.json();
 }
 
 /**
@@ -472,23 +404,17 @@ export async function deletePost(postId: string) {
  * @returns Promise of list of posts and comments of current user
  */
 export async function getMyPosts() {
-  try {
-    const res = await fetch(`${url}/content`, {
-      credentials: "include",
-    });
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    const result = await res.json();
-    console.log(`Get my posts: ${res.status}`);
+  const res = await fetch(`${url}/content`, {
+    credentials: "include",
+  });
 
-    return result;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
+    });
   }
+
+  return await res.json();
 }
 
 /**
@@ -497,42 +423,37 @@ export async function getMyPosts() {
  * @returns status code
  */
 export async function makePost(content: string) {
-  try {
-    if (location === null) {
-      try {
-        location = await getLocation();
-      } catch (e: any) {
-        console.error(e);
-        return e.cause;
-      }
+  if (location === null) {
+    try {
+      location = await getLocation();
+    } catch (e: any) {
+      console.error(e);
+      return e.cause;
     }
-
-    const res = await fetch(`${url}/content/post`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        content: content,
-        locality: {
-          lat: location.lat,
-          lon: location.lon,
-        },
-      }),
-    });
-
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    console.log(`Post: ${res.status}`);
-    return res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
   }
+
+  const res = await fetch(`${url}/content/post`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      content: content,
+      locality: {
+        lat: location.lat,
+        lon: location.lon,
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
+    });
+  }
+
+  return res.json();
 }
 
 /**
@@ -541,29 +462,24 @@ export async function makePost(content: string) {
  * @param postId ID of the Post
  */
 export async function updatePost(content: string, postId: string) {
-  try {
-    const res = await fetch(`${url}/content/post/${postId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        content: content,
-      }),
-    });
+  const res = await fetch(`${url}/content/post/${postId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      content: content,
+    }),
+  });
 
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    console.log(`Updating post status: ${res.status}`);
-    return res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
+    });
   }
+
+  return res.json();
 }
 
 /**
@@ -571,29 +487,24 @@ export async function updatePost(content: string, postId: string) {
  * @param content Text of the reply
  */
 export async function reply(content: string, postId: string) {
-  try {
-    const res = await fetch(`${url}/content/post/${postId}/reply`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        content: content,
-      }),
-    });
+  const res = await fetch(`${url}/content/post/${postId}/reply`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      content: content,
+    }),
+  });
 
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    console.log(`Reply: ${res.status}`);
-    return res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
+    });
   }
+
+  return res.json();
 }
 
 /**
@@ -602,25 +513,20 @@ export async function reply(content: string, postId: string) {
  * @returns Promise with all replies from the specified post
  */
 export async function getReply(postId: string) {
-  try {
-    const res = await fetch(`${url}/content/post/${postId}/reply`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
+  const res = await fetch(`${url}/content/post/${postId}/reply`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
     });
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.status}`, {
-        cause: res.status,
-      });
-    }
-    const result = await res.json();
-    console.log(`Get Replies to ${postId} status: ${res.status}`);
-    return result;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
   }
+
+  return res.json();
 }
 
 /**
@@ -629,26 +535,21 @@ export async function getReply(postId: string) {
  * @returns status code
  */
 export async function makeUpvote(postId: string) {
-  try {
-    const res = await fetch(`${url}/content/post/${postId}/upvote`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
+  const res = await fetch(`${url}/content/post/${postId}/upvote`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(`${res.statusText}`, {
+      cause: res.status,
     });
-    if (!res.ok) {
-      throw new Error(`Response status: ${res.statusText}`, {
-        cause: res.status,
-      });
-    }
-    // const result = await res.json();
-    console.log(`Make Upvote to ${postId} status: ${res.status}`);
-    return res.status;
-  } catch (e: any) {
-    console.error(e);
-    return e.cause;
   }
+
+  return res.json();
 }
 
 const NOMINATIM_REVERSE_ENDPOINT =
