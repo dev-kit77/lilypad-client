@@ -29,14 +29,12 @@
     });
 
     export async function loadMyUser() {
-        const response = await getMyUser();
-        if (typeof response == "number") {
-            console.error(`Cannot get user:${response}`);
-            return;
+        try {
+            const res = await getMyUser();
+            user = res.user;
+        } catch (e: any) {
+            console.error(`Failed to get my user: ${e}, status: ${e.status}`);
         }
-        user = response;
-        console.log("Successfully obtained user data");
-        return 200;
     }
 
     export async function clearUser() {

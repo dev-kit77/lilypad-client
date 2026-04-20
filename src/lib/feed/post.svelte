@@ -28,31 +28,23 @@
             alert("Reply cannot be empty.");
             return;
         }
-        const result = await reply(content.value, id);
-        if (result == 200) {
-            console.log(`Making reply: 200 ok`);
-            content.value = "";
-            return 200;
-        } else {
-            console.error(`Making reply: ${result}`);
-            content.value = "";
 
-            return;
+        try {
+            await reply(content.value, id);
+        } catch (e: any) {
+            console.error(`Failed to make reply: ${e}, status: ${e.status}`);
         }
     }
 
     async function upvote() {
-        const result = await makeUpvote(id);
-        if (result == 200) {
+        try {
+            await makeUpvote(id);
             upvoted = !upvoted;
             setTimeout(() => {
                 updateFeed();
             }, 100);
-            console.log(`Upvoting ${id}: 200 ok`);
-            return 200;
-        } else {
-            console.error(`Upvoting: ${result}`);
-            return;
+        } catch (e: any) {
+            console.error(`Failed to upvote: ${e}, status: ${e.status}`);
         }
     }
 
@@ -62,7 +54,7 @@
      * Find user of this post
      */
     async function getUserFromPost() {
-        findUser(author);
+        findUser(userID);
     }
 
     //TODO implement reporting

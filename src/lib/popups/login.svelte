@@ -11,24 +11,25 @@
         const password = <HTMLInputElement>(
             document.getElementById("passwordsign")
         );
+
         // check for empty
         if (username.value == "" || email.value == "" || password.value == "") {
             alert("All fields must be filled to sign up");
             return;
         }
-        let result = await signUp(email.value, password.value, username.value);
-        if (result == 401) {
-            alert("Unable to Sign Up");
-            username.value = "";
-            email.value = "";
-            password.value = "";
+
+        try {
+            await signUp(email.value, password.value, username.value);
+        } catch (e: any) {
+            alert("Unable to Sign Up.");
             return;
         }
+
+        await loadMyUser();
 
         username.value = "";
         email.value = "";
         password.value = "";
-        return 200;
     }
 
     async function logInHandler() {
@@ -36,18 +37,23 @@
         const password = <HTMLInputElement>(
             document.getElementById("passwordlog")
         );
+
         if (email.value == "" || password.value == "") {
             alert("All fields must be filled to log in");
             return;
         }
-        if ((await logIn(email.value, password.value)) == 403) {
-            alert("Unable to Login");
+
+        try {
+            await logIn(email.value, password.value);
+        } catch (e: any) {
+            alert("Unable to Login.");
             return;
         }
+
         await loadMyUser();
+
         email.value = "";
         password.value = "";
-        return 200;
     }
 </script>
 
