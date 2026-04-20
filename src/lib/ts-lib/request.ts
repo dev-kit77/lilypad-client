@@ -147,12 +147,17 @@ export async function ping() {
  * @returns json Promise containing an array of Posts or status code
  */
 export async function getFeed() {
-  if (location === null) {
+  if (!location) {
     try {
-      location = await getLocation();
+      const exLocation = await getLocation();
+
+      location = await retrieveGeoLocation(exLocation.lat, exLocation.lon);
+
+      if (!location) {
+        throw new Error("Location is null");
+      }
     } catch (e: any) {
-      console.error(e);
-      return e.cause;
+      throw new Error(`Failed to retrieve location`, { cause: e });
     }
   }
 
@@ -423,7 +428,7 @@ export async function getMyPosts() {
  * @returns status code
  */
 export async function makePost(content: string) {
-  if (location === null) {
+  if (!location) {
     try {
       location = await getLocation();
     } catch (e: any) {
