@@ -78,7 +78,7 @@
     export async function findUser(userID: string) {
         try {
             const res = await getUser(userID);
-            user = res;
+            user = res.user;
             feedPosts = false; //set feed to show users
         } catch (e: any) {
             console.error(`Failed to get user: ${e}, status: ${e.status}`);

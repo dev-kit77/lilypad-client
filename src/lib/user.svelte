@@ -31,7 +31,7 @@
     export async function loadMyUser() {
         try {
             const res = await getMyUser();
-            user = res;
+            user = res.user;
         } catch (e: any) {
             console.error(`Failed to get my user: ${e}, status: ${e.status}`);
         }
