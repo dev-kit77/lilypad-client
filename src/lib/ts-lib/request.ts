@@ -35,14 +35,15 @@ async function getLocation() {
  * @returns true if the session is active, false if it was unable to refresh the token
  */
 export async function checkSession() {
-  try {
-    const res = await fetch(`${url}/auth/get-session`, {
-      credentials: "include",
-    });
-    return res.ok;
-  } catch {
-    return false;
+  const res = await fetch(`${url}/auth/get-session`, {
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    console.error(`Failed to get session: ${res.status} ${res.statusText}`);
   }
+
+  return res.ok;
 }
 
 //LOGGING OUT
