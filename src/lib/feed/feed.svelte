@@ -33,20 +33,12 @@
      * @param postID
      */
     export async function findPost(postID: string) {
-        feedPosts = true;
-        feedLoaded = false;
-        feed = [];
-        let result = await getPost(postID);
-        //check for error
-        if (typeof result == "number") {
-            console.error(`Getting the post: ${result}`);
-
-            return result;
+        try {
+            const res = await getPost(postID);
+            //TODO: fix the rest of this function so it actually does what its supposed to??
+        } catch (e: any) {
+            console.error(`Failed to get post: ${e}, status: ${e.status}`);
         }
-        feedLoaded = true;
-        feed.push(result.posts);
-        console.log("Post received: 200");
-        return 200;
     }
 
     /**
@@ -55,20 +47,13 @@
     export async function myPosts() {
         feedPosts = true;
         feedLoaded = false;
-        let result = await getMyPosts();
-        //check for error
-        if (typeof result == "number") {
-            console.error(`Getting my posts: ${result}`);
-
-            return result;
+        try {
+            const res = await getMyPosts();
+            feedLoaded = true;
+            feed = res.posts;
+        } catch (e: any) {
+            console.error(`Failed to get my posts: ${e}, status: ${e.status}`);
         }
-
-        feedLoaded = true;
-        console.log(result);
-
-        feed = result.posts;
-        console.log("My posts received: 200");
-        return 200;
     }
 
     /**
@@ -77,19 +62,13 @@
     export async function updateFeed() {
         feedPosts = true;
         feedLoaded = false;
-        let result = await getFeed();
-        //check for error
-        if (result == 401) {
-            alert("You need to be logged in to see the feed");
-            console.error(`Getting feed: Not logged in`);
-
-            return result;
+        try {
+            const res = await getFeed();
+            feedLoaded = true;
+            feed = res.posts;
+        } catch (e: any) {
+            console.error(`Failed to get feed: ${e}, status: ${e.status}`);
         }
-        feedLoaded = true;
-        feed = result.posts;
-        // console.log(`Feed received: ${JSON.stringify(result.posts)}`);
-        console.log(`Feed received: 200`);
-        return 200;
     }
 
     /**
@@ -97,18 +76,13 @@
      * @param userID
      */
     export async function findUser(userID: string) {
-        const result = await getUser(userID);
-
-        //check for error
-        if (typeof result == "number") {
-            console.error(`Cannot obtain user.`);
-            feedPosts = true;
-            return 400;
+        try {
+            const res = await getUser(userID);
+            user = res;
+            feedPosts = false; //set feed to show users
+        } catch (e: any) {
+            console.error(`Failed to get user: ${e}, status: ${e.status}`);
         }
-        console.log("Fetched User");
-        user = result;
-        feedPosts = false; //set feed to show users
-        return 200;
     }
 </script>
 

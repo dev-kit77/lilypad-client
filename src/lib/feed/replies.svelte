@@ -18,19 +18,17 @@
 
     async function getReplies(postID: string) {
         repliesLoaded = false;
-        const result = await getReply(postID);
-        //check for error
-        if (typeof result == "number") {
-            console.error(`Getting replies: ${result}`);
-
-            return result;
+        try {
+            const res = await getReply(postID);
+            repliesLoaded = true;
+            replies = res.replies;
+        } catch (e: any) {
+            console.error(
+                `Failed to get replies: ${e}, status: ${e.options.cause}`,
+            );
         }
-        repliesLoaded = true;
-        replies = result.replies;
-        console.log(`Replies received: ${JSON.stringify(result)}`);
-        console.log(`Replies received: 200`);
-        return 200;
     }
+
     function updateReplies() {
         if (replyCount > 0) {
             getReplies(postID);

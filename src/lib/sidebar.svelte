@@ -6,11 +6,15 @@
     let visible = $state(false); // is the logout message visible
 
     async function handleLogOut() {
-        const result = await logOut(); //make the request
-        console.log(`Logging Out: ${result}`);
+        try {
+            await logOut(); //make the request
+        } catch (e: any) {
+            console.error(`Failed to log out: ${e}, status: ${e.status}`);
+        }
 
         //clear user
         clearUser();
+
         // show that the user has logged out for 3 seconds
         visible = true;
         setTimeout(() => {
